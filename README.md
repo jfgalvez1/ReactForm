@@ -1,11 +1,11 @@
-# Notion Form App with ReactJS and Notion API
+# ReactJS Form Connected to Notion Database
 
 This is a simple web application built with ReactJS that connects to a Notion Database using the Notion API. It allows you to submit data to a Notion database from a user-friendly form interface.
 
 ## Getting Started
 ### Prerequisites
 Before you begin, ensure you have met the following requirements:
--Node.js installed (version specified in package.json)
+Node.js installed (version specified in package.json)
 
 ### Installation
 To run this application locally, follow these steps:
@@ -57,9 +57,10 @@ cd client
 npm start
 ```
 
-### Contributing
+Once both the client and server are running, you can access the application in your web browser. Fill out the form fields and submit the data to your Notion database.
 
-Contributions are welcome! Please fork the repository and create a pull request with your changes. Be sure to follow the code of conduct.
+### Contributors
+Jose Franco Galvez
 
 
 
