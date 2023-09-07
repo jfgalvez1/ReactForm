@@ -13,11 +13,29 @@ To run this application locally, follow these steps:
 git clone <repository-url>
 ```
 
-Navigate to the client folder.
-cd client
+2. Install server dependencies:
 
-Install the client dependencies.
+```bash
 npm install
+```
+3. Create a .env file and add the following environment variables:
+```bash
+NOTION_SECRET=YOUR_NOTION_API_KEY
+DATABASE_ID=YOUR_NOTION_DATABASE_ID
+PORT=4000
+HOST=localhost
+```
 
-Start the React development server.
-npm start
+### Tutorial
+For a detailed tutorial on how to get your Notion API KEY and Database ID please watch the following video on YouTube:
+```bash
+https://www.youtube.com/watch?v=WbekTHVISh0
+```
+
+4. Navigate to the client directory and install client dependencies:
+
+```bash
+cd client
+npm install
+```
+
