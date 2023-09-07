@@ -4,6 +4,7 @@ const cors = require('cors');
 require('dotenv').config();
 var bodyParser = require('body-parser');
 var jsonParser = bodyParser.json();
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
@@ -16,7 +17,14 @@ const DATABASE_ID = process.env.DATABASE_ID;
 
 const notion = new Client({ auth: NOTION_SECRET });
 
-app.post('/submitFormToNotion', jsonParser, async (req, res) => {
+const limiter = rateLimit({
+    windowMs: 1000, // Set the time window for rate limiting (1 second)
+    max: 3, // Set your desired max requests per second
+    message: "Too many requests for this API",
+});
+
+// Define an endpoint for submitting a form to Notion
+app.post('/submitFormToNotion', limiter, jsonParser, async (req, res) => {
     const name = req.body.name;
     const email = req.body.email;
     const comment = req.body.comment;
@@ -43,7 +51,7 @@ app.post('/submitFormToNotion', jsonParser, async (req, res) => {
                         }
                     ]
                 },
-                "Comments": { // Fixed the syntax here
+                "Comments": {
                     rich_text: [
                         {
                             text: {

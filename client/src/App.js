@@ -5,20 +5,29 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import ReCAPTCHA from 'react-google-recaptcha';
 import Nav from './components/Nav';
+import AxiosRateLimit from 'axios-rate-limit';
 
 function App() {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [comment, setComment] = useState('');
+  // State variables
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [comment, setComment] = useState("");
   const [isCaptchaVisible, setIsCaptchaVisible] = useState(false);
   const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
-  let requestCount = 0;
-  const MAX_REQUESTS_PER_SECOND = 3;
+  const [toastVisible, setToastVisible] = useState(false);
 
+  // Create an Axios instance with rate limiting
+  const axiosWithRateLimit = AxiosRateLimit(axios.create(), {
+    maxRequests: 3, // Maximum requests per second
+    perMilliseconds: 1000, // Time window for rate limiting (1 second)
+  });
+
+  // Handler for reCAPTCHA verification
   const onChanger = () => {
     setIsCaptchaVerified(true);
   };
 
+  // Handler for input field changes
   const handleFieldChange = (field, value) => {
     if (field === 'name') {
       setName(value);
@@ -36,15 +45,31 @@ function App() {
     }
   };
 
+  // Reset form fields and show success toast
+  const resetFormFields = () => {
+    toast.success('Form Submitted Successfully', {
+      onClose: () => {
+        console.log("Resetting Form");
+        setName("");
+        setEmail("");
+        setComment("");
+        setIsCaptchaVisible(false);
+      },
+    });
+  };
+
+  // Show success toast with auto-close
+  const showToast = () => {
+    toast.success('Form Submitted Successfully', {
+      autoClose: 1000, // Set the autoClose option to 1000 milliseconds (1 second)
+    });
+  };
+
+  // Submit form to Notion API
   async function submitFormNotion(e) {
     e.preventDefault();
 
-    if (requestCount >= MAX_REQUESTS_PER_SECOND) {
-      // Display an error message and optionally retry after a delay
-      toast.error('API rate limit exceeded. Please wait and try again later.');
-      return;
-    }
-
+    // Form validation
     if (name === '' || email === '' || comment === '') {
       toast.error('Please fill out all input fields completely');
       return;
@@ -68,14 +93,29 @@ function App() {
         comment: comment,
       };
 
-      const response = await axios.post(url, data,  toast.success('Success'));
-      requestCount++;
-      console.log("Response status:" + response.status);
-      console.log("Response count:" + requestCount);
-     
+      // Use the rate-limited Axios instance
+      const response = await axiosWithRateLimit.post(url, data);
+
+      showToast();
+      
+      // Reload the page after 2 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       console.error('Error: ', error);
-      toast.error('Network response was not okay');
+      if (error.response && error.response.status === 429) {
+        // Handle rate limit exceeded error
+        const retryAfter = error.response.headers['retry-after'];
+        if (retryAfter) {
+          // Wait for the specified time and retry the request
+          setTimeout(() => submitFormNotion(e), parseInt(retryAfter) * 1000);
+        } else {
+          toast.error("Oops! Our servers are busy right now. Please wait a moment and try again.");
+        }
+      } else {
+        toast.error('Network response was not okay');
+      }
     }
   }
 
@@ -90,7 +130,7 @@ function App() {
             </div>
             <div className="form-container w-full text-black lg:w-1/2 py-16 px-12 bg-opacity-10">
               <div className='head'>
-              <h1 className="text-4xl mb-4 text-transparent bg-gradient-to-r bg-clip-text from-gray-400 to-black text-center font-bold">Feedback Form</h1>
+                <h1 className="text-4xl mb-4 text-transparent bg-gradient-to-r bg-clip-text from-gray-400 to-black text-center font-bold">Feedback Form</h1>
               </div>
               <div className='form'>
                 <div className="mt-5">
