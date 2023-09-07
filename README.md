@@ -6,10 +6,12 @@ This is a simple web application built with ReactJS that connects to a Notion Da
 
 To run this application locally, follow these steps:
 
+### Installation
 1. Clone this repository to your local machine.
 
 ```bash
 git clone <repository-url>
+```
 
 Navigate to the client folder.
 cd client
