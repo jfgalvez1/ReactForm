@@ -5,7 +5,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 import ReCAPTCHA from 'react-google-recaptcha';
 import Nav from './components/Nav';
-import AxiosRateLimit from 'axios-rate-limit';
 
 function App() {
   // State variables
@@ -26,12 +25,6 @@ function App() {
         console.error('Error fetching reCAPTCHA site key:', error);
       });
   }, []);
-  
-  // Create an Axios instance with rate limiting
-  const axiosWithRateLimit = AxiosRateLimit(axios.create(), {
-    maxRequests: 3, // Maximum requests per second
-    perMilliseconds: 1000, // Time window for rate limiting (1 second)
-  });
 
   // Handler for reCAPTCHA verification
   const onChanger = () => {
@@ -57,17 +50,26 @@ function App() {
   };
 
   // Submit form to Notion API
-  async function submitFormNotion(e) {
-    e.preventDefault();
-
+  async function submitFormNotion() {
+    
     // Form validation
     if (name === '' || email === '' || comment === '') {
       toast.error('Please fill out all input fields completely');
       return;
     }
 
+    if (!/^[A-Za-z\s]+$/.test(name)) {
+      toast.error('Name should only contain letters and spaces');
+      return;
+    }
+
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       toast.error('Email is invalid. Please try again');
+      return;
+    }
+
+    if (comment.length > 5000) {
+      toast.error('Comment should not exceed 5000 characters');
       return;
     }
 
@@ -84,9 +86,19 @@ function App() {
         comment: comment,
       };
 
-      const response = await axiosWithRateLimit.post(url, data);
+      const response = await axios.post(url, data);
 
       if (response.status === 200) {
+        const submitButton = document.getElementById('submit-button');
+    
+        submitButton.disabled = true;
+       
+        setTimeout(() => {
+          if (submitButton.disabled === true) {
+            submitButton.disabled = false;
+          }
+        }, 5000);
+
         toast.success('Form Submitted Successfully', {
           autoClose: 1000, // Set the autoClose option to 1000 milliseconds (1 second)
         });
@@ -94,24 +106,13 @@ function App() {
         setTimeout(() => {
           window.location.reload();
         }, 2000);
-      } else {
-        // Handle the error condition here
-        toast.error('Form Submission Failed', {
-          autoClose: 3000, // Display the error message for 3 seconds
-        });
+      } 
         
-      }
+      
     } catch (error) {
       console.error('Error: ', error);
       if (error.response && error.response.status === 429) {
-        // Handle rate limit exceeded error
-        const retryAfter = error.response.headers['retry-after'];
-        if (retryAfter) {
-          // Wait for the specified time and retry the request
-          setTimeout(() => submitFormNotion(e), parseInt(retryAfter) * 1000);
-        } else {
-          toast.error("Oops! Our servers are busy right now. Please wait a moment and try again.");
-        }
+          toast.error("API rate limit exceeded. Please try again later.");
       } else {
         toast.error('Network response was not okay');
       }
@@ -169,7 +170,7 @@ function App() {
                   </div>
                 )}
                 <div className="mt-5">
-                  <button className="w-full bg-purple-500 py-3 text-center text-white rounded-lg hover:bg-purple-600" onClick={submitFormNotion}>
+                  <button id ="submit-button" className="w-full bg-purple-500 py-3 text-center text-white rounded-lg hover:bg-purple-600" onClick={submitFormNotion}>
                     Submit
                   </button>
                 </div>
