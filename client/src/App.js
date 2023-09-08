@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -14,8 +14,19 @@ function App() {
   const [comment, setComment] = useState("");
   const [isCaptchaVisible, setIsCaptchaVisible] = useState(false);
   const [isCaptchaVerified, setIsCaptchaVerified] = useState(false);
-  const [toastVisible, setToastVisible] = useState(false);
+  const [reCaptchaSiteKey, setReCaptchaSiteKey] = useState("");
 
+  useEffect(() => {
+    // Fetch the reCAPTCHA site key from your server when the component mounts
+    axios.get('http://localhost:4000/getRecaptchaSiteKey')
+      .then(response => {
+        setReCaptchaSiteKey(response.data.siteKey);
+      })
+      .catch(error => {
+        console.error('Error fetching reCAPTCHA site key:', error);
+      });
+  }, []);
+  
   // Create an Axios instance with rate limiting
   const axiosWithRateLimit = AxiosRateLimit(axios.create(), {
     maxRequests: 3, // Maximum requests per second
@@ -43,26 +54,6 @@ function App() {
     } else {
       setIsCaptchaVisible(false);
     }
-  };
-
-  // Reset form fields and show success toast
-  const resetFormFields = () => {
-    toast.success('Form Submitted Successfully', {
-      onClose: () => {
-        console.log("Resetting Form");
-        setName("");
-        setEmail("");
-        setComment("");
-        setIsCaptchaVisible(false);
-      },
-    });
-  };
-
-  // Show success toast with auto-close
-  const showToast = () => {
-    toast.success('Form Submitted Successfully', {
-      autoClose: 1000, // Set the autoClose option to 1000 milliseconds (1 second)
-    });
   };
 
   // Submit form to Notion API
@@ -93,15 +84,23 @@ function App() {
         comment: comment,
       };
 
-      // Use the rate-limited Axios instance
       const response = await axiosWithRateLimit.post(url, data);
 
-      showToast();
-      
-      // Reload the page after 2 seconds
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000);
+      if (response.status === 200) {
+        toast.success('Form Submitted Successfully', {
+          autoClose: 1000, // Set the autoClose option to 1000 milliseconds (1 second)
+        });
+        // Reload the page after 2 seconds
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000);
+      } else {
+        // Handle the error condition here
+        toast.error('Form Submission Failed', {
+          autoClose: 3000, // Display the error message for 3 seconds
+        });
+        
+      }
     } catch (error) {
       console.error('Error: ', error);
       if (error.response && error.response.status === 429) {
@@ -130,7 +129,7 @@ function App() {
             </div>
             <div className="form-container w-full text-black lg:w-1/2 py-16 px-12 bg-opacity-10">
               <div className='head'>
-                <h1 className="text-4xl mb-4 text-transparent bg-gradient-to-r bg-clip-text from-gray-400 to-black text-center font-bold">Feedback Form</h1>
+                <h1 className="text-4xl mb-4 text-black text-center font-bold">Feedback Form</h1>
               </div>
               <div className='form'>
                 <div className="mt-5">
@@ -164,7 +163,7 @@ function App() {
                 {isCaptchaVisible && (
                   <div className="mt-5 flex justify-center animate-bounce">
                     <ReCAPTCHA
-                      sitekey="6Lc5zPwnAAAAAMYKjevl5lj93-Qk1Hph3asruxT9"
+                      sitekey={reCaptchaSiteKey}
                       onChange={onChanger}
                     />
                   </div>

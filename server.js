@@ -14,6 +14,7 @@ const PORT = process.env.PORT;
 const HOST = process.env.HOST;
 const NOTION_SECRET = process.env.NOTION_SECRET;
 const DATABASE_ID = process.env.DATABASE_ID;
+const reCaptchaSiteKey = process.env.ReCAPTCHA;
 
 const notion = new Client({ auth: NOTION_SECRET });
 
@@ -22,6 +23,11 @@ const limiter = rateLimit({
     max: 3, // Set your desired max requests per second
     message: "Too many requests for this API",
 });
+
+app.get('/getRecaptchaSiteKey', (req, res) => {
+    // Send the reCAPTCHA site key to the client
+    res.json({ siteKey: reCaptchaSiteKey });
+  });
 
 // Define an endpoint for submitting a form to Notion
 app.post('/submitFormToNotion', limiter, jsonParser, async (req, res) => {
