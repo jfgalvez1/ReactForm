@@ -60,6 +60,31 @@ npm start
 
 Once both the client and server are running, you can access the application in your web browser. Fill out the form fields and submit the data to your Notion database.
 
+###Client
+###Dependencies
+- axios (^1.5.0) - A promise-based HTTP client for making requests.
+- axios-rate-limit (^1.3.0) - A rate-limiting library for Axios requests.
+- dotenv (^16.3.1) - Loads environment variables from a .env file.
+- react (^18.2.0) - A JavaScript library for building user interfaces.
+- react-dom (^18.2.0) - Entry point for React rendering.
+- react-google-recaptcha (^3.1.0) - React component for Google reCAPTCHA.
+- react-scripts (5.0.1) - Configuration and scripts for React development.
+- react-toastify (^9.1.3) - Notification library for React applications.
+- web-vitals (^2.1.4) - Library for measuring web vital metrics.
+
+###Server
+###Dependencies
+- @notionhq/client (^2.2.13) - Official Notion API client library.
+- axios-rate-limit (^1.3.0) - A rate-limiting library for Axios requests.
+- body-parser (^1.20.2) - Middleware for parsing request bodies.
+- cors (^2.8.5) - Middleware for enabling Cross-Origin Resource Sharing.
+- dotenv (^16.3.1) - Loads environment variables from a .env file.
+- express (^4.18.2) - A web application framework for Node.js.
+- express-rate-limit (^6.11.0) - Middleware for rate limiting requests.
+- nodemon (^3.0.1) - Utility that monitors for changes and restarts the server.
+
+
+
 ### Contributors
 Jose Franco Galvez
 
