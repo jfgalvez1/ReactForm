@@ -162,7 +162,7 @@ function App() {
                   ></textarea>
                 </div>
                 {isCaptchaVisible && (
-                  <div className="mt-5 flex justify-center animate-bounce">
+                  <div className="mt-5 flex justify-center">
                     <ReCAPTCHA
                       sitekey={reCaptchaSiteKey}
                       onChange={onChanger}
