@@ -19,6 +19,7 @@ git clone <repository-url>
 2. Install server dependencies:
 
 ```bash
+cd server
 npm install
 ```
 
