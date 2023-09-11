@@ -60,8 +60,8 @@ npm start
 
 Once both the client and server are running, you can access the application in your web browser. Fill out the form fields and submit the data to your Notion database.
 
-###Client
-###Dependencies
+### Client
+### Dependencies
 - axios (^1.5.0) - A promise-based HTTP client for making requests.
 - axios-rate-limit (^1.3.0) - A rate-limiting library for Axios requests.
 - dotenv (^16.3.1) - Loads environment variables from a .env file.
@@ -72,8 +72,8 @@ Once both the client and server are running, you can access the application in y
 - react-toastify (^9.1.3) - Notification library for React applications.
 - web-vitals (^2.1.4) - Library for measuring web vital metrics.
 
-###Server
-###Dependencies
+### Server
+### Dependencies
 - @notionhq/client (^2.2.13) - Official Notion API client library.
 - axios-rate-limit (^1.3.0) - A rate-limiting library for Axios requests.
 - body-parser (^1.20.2) - Middleware for parsing request bodies.
